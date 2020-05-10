@@ -5,17 +5,22 @@ public class Gun : MonoBehaviour
 {
     public float damage = 10f;
     public float range = 100f;
+    public float fireRate = 1f;
+    public float impactForce = 30f;
 
     public Camera fpsCam;
     public ParticleSystem muzzleFlash;
     public GameObject impactEffect;
 
+    private float nextTimeToFire = 1f;
+
 
 
     void Update()
     {
-        if(Input.GetButtonDown("Fire1"))
+        if(Input.GetButtonDown("Fire1") && Time.time >= nextTimeToFire)
         {
+            nextTimeToFire = Time.time + 12f / fireRate;
             Shoot();
         }
   
@@ -24,9 +29,10 @@ public class Gun : MonoBehaviour
 
     void Shoot()
     {
-
         muzzleFlash.Play();
+
         RaycastHit hit;
+
         if(Physics.Raycast(fpsCam.transform.position, fpsCam.transform.forward, out hit, range))
         {
             Debug.Log(hit.transform.name);
@@ -39,7 +45,12 @@ public class Gun : MonoBehaviour
                 target.TakeDamage(damage);
             }
 
-            Instantiate(impactEffect, hit.point, Quaternion.LookRotation(hit.normal));
+            if(hit.rigidbody != null)
+            {
+                hit.rigidbody.AddForce(-hit.normal * impactForce);
+            }
+            GameObject impactGameObject = Instantiate(impactEffect, hit.point, Quaternion.LookRotation(hit.normal));
+            Destroy(impactGameObject, 2f);
         }
     }
 }
