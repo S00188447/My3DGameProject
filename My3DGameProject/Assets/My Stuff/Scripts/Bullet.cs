@@ -1,12 +1,17 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 
 public class Bullet : MonoBehaviour
 {
     private Transform target;
 
     public float speed = 70f;
-    public float bulletDamage = 50f;
+    public int bulletDamage = 100;
     public GameObject impactEffect;
+
+    public Text text;
+    string message = "You Died";
+    
 
     public void Seek(Transform _target)
     {
@@ -39,7 +44,24 @@ public class Bullet : MonoBehaviour
         Destroy(effectInstance, 2f);
 
         //player takes damage
+        //TakeDamage(bulletDamage);
         Destroy(gameObject);
         
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+       
+        if (target.gameObject.tag == "Player")
+        {
+            target.gameObject.GetComponent<PlayerHealth>().currentHealth -= bulletDamage;
+      
+            if(target.gameObject.GetComponent<PlayerHealth>().currentHealth <= 0)
+            {
+                text.text = message;
+            }
+         
+                
+        }
     }
 }
